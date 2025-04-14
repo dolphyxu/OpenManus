@@ -16,5 +16,14 @@
     },
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "python.autoComplete.extraPaths": [
+        "/home/xhyh/project/llm/OpenManus",
+        "/home/xhyh/.virtualenvs/manus/lib/python3.10/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/xhyh/project/llm/OpenManus",
+        "/home/xhyh/.virtualenvs/manus/lib/python3.10/site-packages"
+    ],
+    "python.linting.enabled": false
 }

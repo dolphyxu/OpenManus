@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "openmanus",
+            "type": "python",
+            "env": {
+                "PYTHONPATH": "${workspaceRoot}"
+            },
+            "request": "launch",
+            "program": "/home/xhyh/project/llm/OpenManus/run_flow.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
