@@ -1,15 +1,45 @@
 import json
 import time
+from enum import Enum
 from typing import Dict, List, Optional, Union
 
 from pydantic import Field
 
 from app.agent.base import BaseAgent
-from app.flow.base import BaseFlow, PlanStepStatus
+from app.flow.base import BaseFlow
 from app.llm import LLM
 from app.logger import logger
 from app.schema import AgentState, Message, ToolChoice
 from app.tool import PlanningTool
+
+
+class PlanStepStatus(str, Enum):
+    """Enum class defining possible statuses of a plan step"""
+
+    NOT_STARTED = "not_started"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    BLOCKED = "blocked"
+
+    @classmethod
+    def get_all_statuses(cls) -> list[str]:
+        """Return a list of all possible step status values"""
+        return [status.value for status in cls]
+
+    @classmethod
+    def get_active_statuses(cls) -> list[str]:
+        """Return a list of values representing active statuses (not started or in progress)"""
+        return [cls.NOT_STARTED.value, cls.IN_PROGRESS.value]
+
+    @classmethod
+    def get_status_marks(cls) -> Dict[str, str]:
+        """Return a mapping of statuses to their marker symbols"""
+        return {
+            cls.COMPLETED.value: "[✓]",
+            cls.IN_PROGRESS.value: "[→]",
+            cls.BLOCKED.value: "[!]",
+            cls.NOT_STARTED.value: "[ ]",
+        }
 
 
 class PlanningFlow(BaseFlow):
@@ -140,8 +170,17 @@ class PlanningFlow(BaseFlow):
                             logger.error(f"Failed to parse tool arguments: {args}")
                             continue
 
-                    # Ensure plan_id is set correctly and execute the tool
+                    # Ensure plan_id is set correctly
                     args["plan_id"] = self.active_plan_id
+                    
+                    # 确保 steps 参数是非空的字符串列表
+                    if "command" in args and args["command"] == "create":
+                        if "steps" not in args or not args["steps"] or not isinstance(args["steps"], list):
+                            logger.warning("Missing or invalid 'steps' parameter, using default steps")
+                            args["steps"] = ["Analyze request", "Execute task", "Verify results"]
+                        else:
+                            # 确保所有步骤都是字符串
+                            args["steps"] = [str(step) for step in args["steps"]]
 
                     # Execute the tool via ToolCollection instead of directly
                     result = await self.planning_tool.execute(**args)

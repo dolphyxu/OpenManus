@@ -20,7 +20,7 @@ except ImportError as e:
 
 async def test_chatglm_ollama():
     """Test OpenManus with ChatGLM via Ollama."""
-    
+
     # Create LLM settings for ChatGLM via Ollama
     chatglm_settings = LLMSettings(
         model="EntropyYue/chatglm3:latest",
@@ -31,27 +31,27 @@ async def test_chatglm_ollama():
         max_tokens=4096,
         temperature=0.7
     )
-    
+
     # Create a dictionary of LLM settings
     llm_settings = {"default": chatglm_settings}
-    
+
     # Create LLM instance with custom settings
     llm = LLM(llm_config=llm_settings)
-    
+
     # Create messages
     system_msg = Message.system_message("You are a helpful AI assistant.")
     user_msg = Message.user_message("请用中文回答：你是什么模型？你能做什么？")
-    
+
     try:
         print("Sending request to ChatGLM via OpenManus LLM module...")
-        
+
         # Call the LLM
         response = await llm.ask(
             messages=[user_msg],
             system_msgs=[system_msg],
             stream=False
         )
-        
+
         print("\nResponse from ChatGLM:\n")
         print(response)
         print("\n" + "-"*50)
